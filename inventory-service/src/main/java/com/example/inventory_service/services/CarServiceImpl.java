@@ -6,9 +6,13 @@ import com.example.inventory_service.entity.CarEntity;
 import com.example.inventory_service.repository.CarRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +31,17 @@ public class CarServiceImpl implements CarService {
                 .build();
         CarEntity savedCar = carRepository.save(carEntity);
         CarResponse response = new ModelMapper().map(savedCar, CarResponse.class);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .replacePath("/inventory-service/car/{id}")
+                .host("localhost")
+                .port(9090)
+                .buildAndExpand(savedCar.getId())
+                .toUri();
+        //return ResponseEntity.created(location).body(response);
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(location);
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 
     @Override
@@ -60,6 +73,20 @@ public class CarServiceImpl implements CarService {
         } else {
             return new ResponseEntity<>("Not enough quantity available!", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public ResponseEntity<CarResponse> getCarById(Long id) {
+        Optional<CarEntity> carOptional = carRepository.findById(id);
+
+        if (carOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        CarEntity car = carOptional.get();
+        CarResponse response = new ModelMapper().map(car, CarResponse.class);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

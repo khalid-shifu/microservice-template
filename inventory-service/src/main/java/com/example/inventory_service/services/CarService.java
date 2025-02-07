@@ -13,4 +13,6 @@ public interface CarService {
     ResponseEntity<List<CarResponse>> getAllCars();
 
     ResponseEntity<String> buyCar(Long id, Long quantity);
+
+    ResponseEntity<CarResponse> getCarById(Long id);
 }

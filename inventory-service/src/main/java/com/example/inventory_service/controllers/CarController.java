@@ -32,5 +32,9 @@ public class CarController {
         return carService.buyCar(id, quantity);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CarResponse> getCarById(@PathVariable("id") Long id) {
+        return carService.getCarById(id);
+    }
 }
 

@@ -1,5 +1,7 @@
 package com.example.order_service.services;
 
+import com.example.order_service.exceptions.FeignClientException;
+import com.example.order_service.exceptions.ServiceUnavailableException;
 import com.example.order_service.feignConfig.OrderServiceFeignClient;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +24,13 @@ public class OrderServiceImpl implements OrderService {
         } catch (FeignException e) {
             HttpStatus status = HttpStatus.resolve(e.status());
 
-            if (status == null) {
-                status = HttpStatus.INTERNAL_SERVER_ERROR;
-                return new ResponseEntity<>("inventory-service down!", status);
-            }
-            System.out.println("status = " + status);
-            return new ResponseEntity<>(e.contentUTF8(), status);
+                if (status == null) {
+                    status = HttpStatus.INTERNAL_SERVER_ERROR;
+                    throw new ServiceUnavailableException("inventory-service down!");
+                }
+                System.out.println("status : " + status);
+                System.out.println("e.contentUTF8() : " + e.contentUTF8());
+                throw new FeignClientException("Feign client exception", status, e.contentUTF8());
         }
     }
 }

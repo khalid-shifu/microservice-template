@@ -37,11 +37,11 @@ public class CarServiceImpl implements CarService {
                 .port(9090)
                 .buildAndExpand(savedCar.getId())
                 .toUri();
-        //return ResponseEntity.created(location).body(response);
-
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
         return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
+        //return ResponseEntity.created(location).body(response);
     }
 
     @Override

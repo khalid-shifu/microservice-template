@@ -3,6 +3,7 @@ package com.example.inventory_service.controllers;
 import com.example.inventory_service.dto.CarRequest;
 import com.example.inventory_service.dto.CarResponse;
 import com.example.inventory_service.services.CarService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,7 @@ public class CarController {
     private final CarService carService;
 
     @PostMapping("/create")
-    public ResponseEntity<CarResponse> createCar(@RequestBody CarRequest carRequest) {
+    public ResponseEntity<CarResponse> createCar(@Valid @RequestBody CarRequest carRequest) {
         return carService.createCar(carRequest);
     }
 

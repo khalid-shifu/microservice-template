@@ -17,7 +17,7 @@ import java.util.Locale;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/car")
+@RequestMapping("/v1/car")
 @Tag(name = "Car API", description = "API for managing Cars")
 public class CarController {
 
@@ -25,7 +25,7 @@ public class CarController {
     private final MessageSource messageSource;
 
     @GetMapping
-    @Operation(summary = "Welcomes user to the system", description = "This endpoint returns a welcome message to the user.")
+    @Operation(summary = "Welcome message", description = "Welcomes user to the system")
     public ResponseEntity<String> welcomeMessage() {
         Locale locale = LocaleContextHolder.getLocale();
         String welcomeMessage = messageSource.getMessage("welcome.message", null, "Default message", locale);
@@ -53,5 +53,39 @@ public class CarController {
     public ResponseEntity<CarResponse> getCarById(@PathVariable("id") Long id) {
         return carService.getCarById(id);
     }
-}
 
+    // versioning with request parameter like Amazon
+    // its request url is /v1/car/version?v=1
+    @GetMapping(path = "/version", params = "v=1")
+    public ResponseEntity<String> getStringForV1() {
+        return ResponseEntity.ok("Version 1");
+    }
+
+    @GetMapping(path = "/version", params = "v=2")
+    public ResponseEntity<String> getStringForV2() {
+        return ResponseEntity.ok("Version 2");
+    }
+
+    // versioning with headers like Microsoft
+    @GetMapping(path = "/version", headers = "X-API-VERSION=1")
+    public ResponseEntity<String> getStringForV1Header() {
+        return ResponseEntity.ok("Request header Version 1");
+    }
+
+    @GetMapping(path = "/version", headers = "X-API-VERSION=2")
+    public ResponseEntity<String> getStringForV2Header() {
+        return ResponseEntity.ok("Request header Version 2");
+    }
+
+    // versioning with media type like github
+    // header -> Accept: application/vnd.company.app-v1+json
+    @GetMapping(path = "/version", produces = "application/vnd.company.app-v1+json")
+    public ResponseEntity<String> getStringForV1MediaType() {
+        return ResponseEntity.ok("media type Version 1");
+    }
+
+    @GetMapping(path = "/version", produces = "application/vnd.company.app-v2+json")
+    public ResponseEntity<String> getStringForV2MediaType() {
+        return ResponseEntity.ok("media type Version 2");
+    }
+}
